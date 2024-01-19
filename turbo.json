@@ -1,0 +1,31 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "NODE_ENV",
+    "DEPLOY_SHA",
+    "CDK_DEFAULT_REGION",
+    "AWS_REGION",
+    "AWS_CONTAINER_CREDENTIALS_RELATIVE_URI",
+    "DATABASE_URL",
+    "NEXTAUTH_URL",
+    "NEXTAUTH_SECRET",
+    "FACEBOOK_CLIENT_SECRET",
+    "GOOGLE_CLIENT_SECRET",
+    "TWITTER_CLIENT_SECRET",
+    "DISCORD_CLIENT_SECRET",
+    "OPENAI_API_KEY"
+  ],
+  "pipeline": {
+    "lint": {},
+    "check-types": {},
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    }
+  }
+}

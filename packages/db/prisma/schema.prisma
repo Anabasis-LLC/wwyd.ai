@@ -1,0 +1,169 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator zod {
+  provider               = "zod-prisma-types"
+  output                 = "../schemas"
+  useMultipleFiles       = true // default is false
+  createInputTypes       = false // default is true
+  addInputTypeValidation = false // default is true
+  addIncludeType         = false // default is true
+  addSelectType          = false // default is true
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  uuid              String    @unique @default(dbgenerated("gen_random_uuid()"))
+  email             String    @unique
+  name              String
+  encryptedPassword String?
+  magicTokenSalt    String?
+  timeZone          String    @default("GMT")
+  emailVerifiedAt   DateTime?
+  avatarUrl         String?
+  avatarId          Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  avatar Image? @relation(fields: [avatarId], references: [id])
+
+  connections OauthConnection[]
+  stories     Story[]
+  choices     UserStoryChoice[]
+}
+
+model OauthConnection {
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(dbgenerated("gen_random_uuid()"))
+  userId       Int
+  provider     String
+  providerId   String
+  accessToken  String
+  refreshToken String?
+  email        String
+  name         String
+  image        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerId])
+}
+
+model Image {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(dbgenerated("gen_random_uuid()"))
+  filename    String
+  contentType String
+  byteSize    Int
+  width       Int?
+  height      Int?
+  checksum    String
+  key         String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users   User[]
+  stories Story[]
+}
+
+model Story {
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(dbgenerated("gen_random_uuid()"))
+  userId       Int
+  coverImageId Int
+  slug         String   @unique
+  title        String   @db.VarChar(70)
+  tagline      String   @db.VarChar(140)
+  hook         String
+  chapterCount Int
+  choiceCount  Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user       User  @relation(fields: [userId], references: [id])
+  coverImage Image @relation(fields: [coverImageId], references: [id])
+
+  endings     StoryEnding[]
+  chapters    StoryChapter[]
+  choices     StoryChoice[]
+  userChoices UserStoryChoice[]
+}
+
+model StoryEnding {
+  id        Int      @id @default(autoincrement())
+  uuid      String   @unique @default(dbgenerated("gen_random_uuid()"))
+  storyId   Int
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  chapters StoryChapter[]
+}
+
+model StoryChapter {
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(dbgenerated("gen_random_uuid()"))
+  storyId       Int
+  storyEndingId Int?
+  number        Int
+  path          String
+  text          String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  story  Story        @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  ending StoryEnding? @relation(fields: [storyEndingId], references: [id])
+
+  choices StoryChoice[]
+
+  @@unique([storyId, path])
+}
+
+model StoryChoice {
+  id        Int      @id @default(autoincrement())
+  uuid      String   @unique @default(dbgenerated("gen_random_uuid()"))
+  storyId   Int
+  chapterId Int
+  number    Int
+  text      String
+  summary   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  story   Story        @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  chapter StoryChapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  userChoices UserStoryChoice[]
+}
+
+model UserStoryChoice {
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(dbgenerated("gen_random_uuid()"))
+  userId        Int
+  storyChoiceId Int
+  storyId       Int
+  path          String
+  number        Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  choice StoryChoice @relation(fields: [storyChoiceId], references: [id], onDelete: Cascade)
+  story  Story       @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId, number])
+  @@unique([userId, storyId, path])
+}

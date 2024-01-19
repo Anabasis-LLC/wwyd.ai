@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Example:
+# $REPO_HOME/.bin/ecs-exec -p prod -c Apps -s Web -e /bin/bash
+usage() { echo "Usage: $0 -p <iam-profile> -c <cluster-name> -s <service-name> -e <exec-command>" 1>&2; exit 1; }
+
+while getopts "p:c:s:e:" o; do
+  case "${o}" in
+    p)
+      profile=${OPTARG}
+      ;;
+    c)
+      cluster=${OPTARG}
+      ;;
+    s)
+      service=${OPTARG}
+      ;;
+    e)
+      command=${OPTARG}
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+
+if [ -z "${profile}" ] || [ -z "${cluster}" ] || [ -z "${service}" ] || [ -z "${command}" ]; then
+  usage
+fi
+
+ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text --profile $profile)
+CLUSTER=arn:aws:ecs:us-west-1:${ACCOUNT_ID}:cluster/${cluster}
+SERVICE_NAME=${service}Service
+CONTAINER=${service}Container
+TASK=$(aws ecs list-tasks --cluster $CLUSTER --service-name $SERVICE_NAME --query "taskArns[0]" --output text --profile $profile)
+
+echo "profile = ${profile}"
+echo "cluster = ${cluster}"
+echo "service = ${service}"
+echo "command = ${command}"
+echo "task = ${TASK}"
+
+aws ecs execute-command \
+  --cluster $CLUSTER \
+  --task $TASK \
+  --container $CONTAINER \
+  --interactive \
+  --command "$command" \
+  --profile $profile

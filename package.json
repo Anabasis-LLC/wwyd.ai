@@ -1,0 +1,44 @@
+{
+  "name": "wwyd",
+  "private": true,
+  "packageManager": "yarn@3.5.1",
+  "engines": {
+    "node": "20.9.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "turbo run lint",
+    "check-types": "turbo run check-types",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "db:reset": "yarn workspace @wwyd/db db:reset",
+    "db:migrate": "yarn workspace @wwyd/db db:migrate",
+    "db:generate": "yarn workspace @wwyd/db db:generate",
+    "deploy": "yarn workspace @wwyd/aws deploy"
+  },
+  "devDependencies": {
+    "@wwyd/eslint-config": "workspace:*",
+    "cdk": "^2.122.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.3.0",
+    "turbo": "^1.11.3",
+    "typescript": "^5.3.3"
+  },
+  "lint-staged": {
+    "apps/web/**/*.{tsx,ts}": [
+      "node_modules/.bin/prettier --write --config packages/prettier-config/index.js",
+      "node_modules/.bin/eslint -c apps/web/.eslintrc.js --max-warnings=0"
+    ],
+    "packages/db/**/*.ts": [
+      "node_modules/.bin/prettier --write --config packages/prettier-config/index.js",
+      "node_modules/.bin/eslint -c packages/db/.eslintrc.js --max-warnings=0"
+    ]
+  },
+  "dependencies": {
+    "react-icons": "^5.0.1"
+  }
+}

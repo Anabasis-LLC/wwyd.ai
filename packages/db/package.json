@@ -1,0 +1,27 @@
+{
+  "name": "@wwyd/db",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "format": "../../node_modules/.bin/prettier --write .",
+    "lint": "../../node_modules/.bin/eslint \"**/*.ts*\"",
+    "check-types": "../../node_modules/.bin/tsc --noEmit",
+    "db:reset": "prisma migrate reset",
+    "db:migrate": "prisma migrate dev && ../../node_modules/.bin/prettier --write .",
+    "db:generate": "prisma generate && ../../node_modules/.bin/prettier --write .",
+    "db:deploy": "DATABASE_URL=$PRODUCTION_DATABASE_URL prisma migrate deploy"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.16.2",
+    "zod-prisma-types": "^2.8.1"
+  },
+  "devDependencies": {
+    "@wwyd/eslint-config": "workspace:^",
+    "@wwyd/prettier-config": "workspace:^",
+    "@wwyd/tsconfig": "workspace:^",
+    "neonctl": "^1.26.1",
+    "prisma": "^4.16.2"
+  },
+  "prettier": "@wwyd/prettier-config"
+}

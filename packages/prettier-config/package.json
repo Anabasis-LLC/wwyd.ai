@@ -1,0 +1,11 @@
+{
+  "name": "@wwyd/prettier-config",
+  "private": true,
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.8"
+  }
+}

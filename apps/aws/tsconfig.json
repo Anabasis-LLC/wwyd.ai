@@ -1,0 +1,12 @@
+{
+  "extends": "@wwyd/tsconfig/base.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["es2020", "dom"],
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "experimentalDecorators": true,
+  },
+  "exclude": ["node_modules", "cdk.out"]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@wwyd/aws",
+  "private": true,
+  "scripts": {
+    "lint": "../../node_modules/.bin/eslint lib --ext .ts",
+    "check-types": "../../node_modules/.bin/tsc --noEmit",
+    "deploy:org": "DEPLOY_SHA=$(git rev-parse --short HEAD) cdk deploy OrgStack",
+    "deploy:infra": "DEPLOY_SHA=$(git rev-parse --short HEAD) cdk deploy InfraStack",
+    "deploy:apps": "make --directory $REPO_HOME && DEPLOY_SHA=$(git rev-parse --short HEAD) cdk deploy AppsStack",
+    "deploy": "make --directory $REPO_HOME && DEPLOY_SHA=$(git rev-parse --short HEAD) cdk deploy --all --require-approval never"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.122.0",
+    "constructs": "^10.3.0",
+    "source-map-support": "^0.5.21"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@wwyd/eslint-config": "workspace:*",
+    "@wwyd/prettier-config": "workspace:*",
+    "@wwyd/tsconfig": "workspace:*",
+    "aws-cdk": "^2.122.0",
+    "ts-node": "^10.9.2"
+  },
+  "prettier": "@wwyd/prettier-config"
+}
